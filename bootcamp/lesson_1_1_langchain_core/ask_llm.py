@@ -24,18 +24,26 @@ CHAT_OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 CHAT_MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 LOCAL_MODELS = {
-    "mistral": {"model": OllamaLLM(model="mistral"), "available": True},
-    "deepseek-r1": {"model": OllamaLLM(model="deepseek-r1"), "available": False},
+    "mistral": {
+        "model": OllamaLLM(model="mistral", temperature=0.0),
+        "available": True,
+    },
+    "deepseek-r1": {
+        "model": OllamaLLM(model="deepseek-r1", temperature=0.0),
+        "available": False,
+    },
 }
 
 REMOTE_MODELS = {
     "gpt-4o-mini": {
-        "model": ChatOpenAI(model="gpt-4o-mini", api_key=CHAT_OPENAI_API_KEY),
+        "model": ChatOpenAI(
+            model="gpt-4o-mini", api_key=CHAT_OPENAI_API_KEY, temperature=0.0
+        ),
         "available": bool(CHAT_OPENAI_API_KEY),
     },
     "mistral": {
         "model": ChatMistralAI(
-            model="mistral-small-latest", api_key=CHAT_MISTRAL_API_KEY
+            model="mistral-small-latest", api_key=CHAT_MISTRAL_API_KEY, temperature=0.0
         ),
         "available": bool(CHAT_MISTRAL_API_KEY),
     },
