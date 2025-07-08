@@ -13,6 +13,10 @@ langchain = ">=0.3,<0.4"
 openai = "^1.93.2"
 mistralai = "^1.9.1"
 python-dotenv = "^1.1.1"
+langchain-openai = "^0.3.27"
+langchain-community = "^0.3.27"
+langchain-mistralai = "^0.2.11"
+langchain-ollama = "^0.3.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.1"

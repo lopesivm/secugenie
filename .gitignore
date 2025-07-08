@@ -1,2 +1,101 @@
+# Environment variables and secrets
 .env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv
+.python-version
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# PyCharm and other JetBrains IDEs
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Data files
+*.csv
+*.dat
+*.pkl
+*.pth
+*.h5
+*.hdf5
+*.parquet
+*.feather
+*.arrow
+*.db
+*.sqlite
+
+# Model files and caches
+*.ckpt
+*.pt
+*.bin
+*.model
+.torch/
+.cache/
+.vector_cache/
+
+# LangChain and LLM specific
+.langchain.db
+.chroma/
+.faiss/
+.qdrant/
+
+# Logs and temporary files
+logs/
+*.log
+*.tmp
+tmp/
+temp/
+
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
 career/
