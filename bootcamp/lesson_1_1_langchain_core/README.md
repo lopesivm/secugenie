@@ -1,97 +1,91 @@
 # Lesson 1.1 — LangChain Core Quickstart 🚀
 
-**Week 1 — LLM App Bootcamp**
+**Week 1 — LangChain Bootcamp**
 
 ---
 
-## Goal
+## 🎯 Goal
 
-Wrap an OpenAI or Mistral model behind a simple chat endpoint using **LangChain 0.3** so you can query it from any Python script or CLI tool.
-
-You’ll also set up a clean project structure under `bootcamp/lesson_1_1_langchain_core/` within a single Poetry-managed workspace rooted at `secugenie/`, so each week’s progress is easy to track and share.
-
----
-
-## Exercises
-
-| #   | Title                       | What you’ll build                                                                                                                        |
-| --- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Set up your environment** | Create a Poetry-managed Python project **at the root of `secugenie/`**, and install `langchain`, `openai`, `mistralai`, `python-dotenv`. |
-| 2   | **Hello, ChatOpenAI**       | Send a "Hello, world!" prompt to OpenAI using `ChatOpenAI` (via `langchain_openai`) and print the model’s response.                      |
-| 3   | **Wrap in a helper**        | Write a `ask_llm(prompt: str, model: str = ...) -> str` function that returns a model reply.                                             |
-| 4   | **Swap to Mistral**         | Replace OpenAI with `ChatMistralAI` (via `langchain_mistralai`)—verify modularity. Requires Mistral API key.                             |
-| 5   | **Turn it into a CLI**      | Create `chat.py` script callable from terminal: `python chat.py "What is RAG in LLMs?"`.                                                 |
-| 6   | **BONUS – Config via .env** | Store your API keys + model in a `.env` file. Load them using `dotenv_values` from `python-dotenv`.                                      |
+Set up LangChain 0.3 using OpenAI and/or Mistral/Ollama, and build a reusable LLM interface (`ask_llm()`) that can be wired into a CLI (`chat.py`).
+This is the foundation for every future component in SecuGenie: RAG, agents, fine-tuning, and triage.
 
 ---
 
-## Step-by-Step Setup (Poetry, Root-Based)
+## ✅ Milestones
 
-### 1. Environment Setup
+| Step | Title                         | Description                                                                                                                     |
+| ---- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | **Environment Setup**         | Initialize a Poetry project at the `secugenie/` root. Install LangChain + OpenAI + Mistral + dotenv + community. Create `.env`. |
+| 2    | **Test LangChain Call**       | Create a test script to call `ChatOpenAI` using a prompt. Print the output. Verify key loads.                                   |
+| 3    | **`ask_llm()` Helper**        | Build a function to abstract model usage: OpenAI or Mistral, based on name. Return plain string output.                         |
+| 4    | **Ollama Support (optional)** | Add `local=True` mode using `langchain_community.llms.Ollama`. Run local LLMs like `mistral`, `llama3`.                         |
+| 5    | **CLI Interface**             | Create `chat.py`, which reads a prompt from CLI and prints model output. Uses `ask_llm()` internally.                           |
+| 6    | **Refactor & Commit**         | Structure into `ask_llm.py`, `chat.py`. Test. Clean code. Commit with tag.                                                      |
+
+---
+
+## 🧱 Folder Structure
 
 ```bash
-# Create main project directory
-mkdir -p secugenie && cd secugenie
-
-# Initialize poetry at the project root
-poetry init --name secugenie --python "^3.10" --dependency langchain --dependency openai --dependency mistralai --dependency python-dotenv -n
-
-# Install dependencies
-poetry install
-
-# Create lesson folder for this week
-mkdir -p bootcamp/lesson_1_1_langchain_core && cd bootcamp/lesson_1_1_langchain_core
+bootcamp/lesson_1_1_langchain_core/
+├── README.md                # ← This file
+├── ask_llm.py              # ← Your helper function
+├── chat.py                 # ← CLI entrypoint
+├── 01_setup_env.ipynb      # ← Optional notebook for tests
+└── .env                    # ← API keys (in root)
 ```
 
-### 2. Create a .env file in the project root
+---
 
-```env
-OPENAI_API_KEY=sk-...
-MISTRAL_API_KEY=...
-MODEL=openai/gpt-4o
-```
-
-Make sure this file is listed in `.gitignore`.
-
-### 3. Run a model call (from lesson folder)
+## 💡 `ask_llm()` Design Tip
 
 ```python
-from langchain_openai import ChatOpenAI
+# ask_llm.py
+from dotenv import dotenv_values
 
-llm = ChatOpenAI(model="gpt-4o")
-response = llm.invoke("Hello, world!")
-print(response.content)
+config = dotenv_values()
+
+
+def ask_llm(prompt: str, model: str = "gpt-4o", local: bool = False) -> str:
+    if local:
+        from langchain_community.llms import Ollama
+        llm = Ollama(model=model)
+        return llm.invoke(prompt)
+    else:
+        from langchain_openai import ChatOpenAI
+        llm = ChatOpenAI(model=model)
+        return llm.invoke(prompt).content
 ```
 
-To run scripts with Poetry:
+Then in `chat.py`:
+
+```python
+import sys
+from ask_llm import ask_llm
+
+if __name__ == "__main__":
+    prompt = sys.argv[1]
+    print(ask_llm(prompt))
+```
+
+---
+
+## 🏁 Final Output
+
+By the end of Lesson 1.1, you should be able to:
+
+- Run `poetry run python chat.py "What is a CVE?"`
+- Get an answer from OpenAI, Mistral, or Ollama
+- Swap models easily with `MODEL=` in your `.env`
+- Reuse `ask_llm()` in future lessons
+
+---
+
+## 🚀 Commit Message
 
 ```bash
-poetry run python chat.py
+git add bootcamp/lesson_1_1_langchain_core/
+git commit -m "feat: complete LangChain lesson 1.1 with ask_llm and CLI"
 ```
 
----
-
-## Key Takeaways
-
-- LangChain v0.3 is **modular**—import from `langchain_core`, `langchain_openai`, etc.
-- Use `ChatOpenAI` and `ChatMistralAI` to access models with unified APIs.
-- Store secrets in `.env`, never in code.
-- Maintain a single Poetry project at the root to streamline dependency management across all lessons.
-
----
-
-## Output
-
-Push this lesson to:
-
-```
-secugenie/bootcamp/lesson_1_1_langchain_core/
-```
-
-Tag your commit:
-
-```
-git commit -m "feat: lesson 1.1 complete"
-```
-
-Let’s rock! 🚀
+Let’s roll! 💪

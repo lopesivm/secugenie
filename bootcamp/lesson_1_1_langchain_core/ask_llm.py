@@ -5,12 +5,23 @@ Large Language Models (LLMs) using the langchain library.
 It defines available models and a function to send a message to a specified model.
 """
 
+import os
 import time
+from pathlib import Path
 from typing import TypedDict
 
+from dotenv import load_dotenv
 from langchain_mistralai import ChatMistralAI
 from langchain_ollama import OllamaLLM
 from langchain_openai import ChatOpenAI
+
+# Load .env from project root
+root_dir = Path(__file__).resolve().parents[3]
+load_dotenv(root_dir / ".env")
+
+# Configure API clients
+CHAT_OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+CHAT_MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 LOCAL_MODELS = {
     "mistral": {"model": OllamaLLM(model="mistral"), "available": True},
@@ -18,10 +29,15 @@ LOCAL_MODELS = {
 }
 
 REMOTE_MODELS = {
-    "gpt-4o-mini": {"model": ChatOpenAI(model="gpt-4o-mini"), "available": True},
+    "gpt-4o-mini": {
+        "model": ChatOpenAI(model="gpt-4o-mini", api_key=CHAT_OPENAI_API_KEY),
+        "available": bool(CHAT_OPENAI_API_KEY),
+    },
     "mistral": {
-        "model": ChatMistralAI(model="mistral-small-latest"),
-        "available": True,
+        "model": ChatMistralAI(
+            model="mistral-small-latest", api_key=CHAT_MISTRAL_API_KEY
+        ),
+        "available": bool(CHAT_MISTRAL_API_KEY),
     },
 }
 
@@ -68,21 +84,15 @@ def ask_llm(model_name: str, message: str, remote: bool = False) -> LLMResponse:
     if not model or not model["available"]:
         raise ValueError(f"Model {model_name} not found or not available")
 
-    start_time = time.time()
-    raw_response = model["model"].invoke(message)
-    inference_time = time.time() - start_time
+    t0 = time.time()
+    raw = model["model"].invoke(message)
+    inference_time = round(time.time() - t0, 2)
 
-    if isinstance(raw_response, str):
-        response = raw_response
-    else:
-        try:
-            response = raw_response.content
-        except AttributeError as err:
-            raise ValueError("Response content not found") from err
+    response_text = getattr(raw, "content", str(raw))
 
     return LLMResponse(
-        message=str(response),
+        message=response_text,
         model_name=model_name,
         remote=remote,
-        inference_time=round(inference_time, 2),
+        inference_time=inference_time,
     )

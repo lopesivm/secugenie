@@ -10,19 +10,21 @@ Example:
 """
 
 import argparse
+import os
 import sys
+from pathlib import Path
 
 from ask_llm import ask_llm
+from dotenv import load_dotenv
 
-DEFAULT_MODEL = "mistral"
+root_dir = Path(__file__).resolve().parents[3]
+load_dotenv(root_dir / ".env")
+
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "mistral")
+DEFAULT_REMOTE = os.getenv("DEFAULT_REMOTE", "false").lower() == "true"
 
 
 def create_parser() -> argparse.ArgumentParser:
-    """Create and configure the argument parser for the CLI.
-
-    Returns:
-        An configured argument parser instance.
-    """
     parser = argparse.ArgumentParser(
         description="Ask a question to a Large Language Model.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -41,7 +43,8 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--remote",
         action="store_true",
-        help="Use a remote model instead of a local one (default: False).",
+        default=DEFAULT_REMOTE,
+        help=f"Use a remote model instead of a local one (default: {DEFAULT_REMOTE}).",
     )
     return parser
 
